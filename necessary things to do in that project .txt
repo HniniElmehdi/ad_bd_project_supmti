@@ -1,0 +1,79 @@
+ 1. Création et manipulation des tables
+CREATE TABLE
+
+PRIMARY KEY (PK)
+
+FOREIGN KEY (FK)
+
+IDENTITY
+
+NOT NULL, UNIQUE, DEFAULT, CHECK
+
+Clé primaire composée
+
+Contrainte d’intégrité référentielle
+
+ALTER TABLE (avec ADD, DROP, MODIFY, RENAME)
+
+DROP TABLE
+
+🔹 2. Commandes de base SQL
+SELECT
+
+INSERT
+
+UPDATE
+
+DELETE
+
+WHERE clause (avec sous-requêtes : dans SELECT, DELETE, UPDATE)
+
+GROUP BY, HAVING
+
+Fonctions : MAX, MIN, AVG, SUM, COUNT
+
+ALL, ANY
+
+🔹 3. Jointures
+INNER JOIN
+
+LEFT JOIN / RIGHT JOIN
+
+🔹 4. Vues
+Création de VIEW
+
+🔹 5. Programmation T-SQL (bases)
+Variables
+
+BEGIN / END
+
+IF, ELSE, CASE
+
+WHILE
+
+GO
+
+🔹 6. Transactions
+BEGIN TRANSACTION
+
+COMMIT, ROLLBACK
+
+TRY…CATCH
+
+🔹 7. Programmation avancée
+Procédures stockées
+
+Fonctions stockées : scalaire & table
+
+TRIGGERS (avec inserted, deleted)
+
+RAISEERROR
+
+DELETE ON CASCADE
+
+🔹 8. Sécurité (basique)
+CREATE LOGIN
+
+GRANT, REVOKE, DENY
+
+Exemple de chiffrement ou hachage

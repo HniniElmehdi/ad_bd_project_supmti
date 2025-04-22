@@ -2,44 +2,48 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable;
+    use HasFactory;
+    use Notifiable;
+    // Specify the table name
+    protected $table = 'Users';
+    public $timestamps = false;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
+    // Define the fillable fields for mass assignment
     protected $fillable = [
-        'name',
-        'email',
-        'password',
+        'Nom',
+        'Prénom',
+        'Email',
+        'DateNaissance',
+        'MotDePasse',
+        'user_role',
+        'DateCréation'
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var array<int, string>
-     */
+    // Set the primary key for the table (IDUser)
+    protected $primaryKey = 'IDUser';
+
+    // Hide the password field when the user is fetched
     protected $hidden = [
-        'password',
-        'remember_token',
+        'MotDePasse',
     ];
 
-    /**
-     * The attributes that should be cast.
-     *
-     * @var array<string, string>
-     */
-    protected $casts = [
-        'email_verified_at' => 'datetime',
-        'password' => 'hashed',
-    ];
+    // Specify that the ID should be treated as an integer (not auto-incrementing)
+    public $incrementing = true;
+
+    // Define any relationships, if needed
+    public function etudiant()
+    {
+        return $this->hasOne(Etudiant::class, 'IDUser');
+    }
+
+    public function professeur()
+    {
+        return $this->hasOne(Professeur::class, 'IDUser');
+    }
 }
