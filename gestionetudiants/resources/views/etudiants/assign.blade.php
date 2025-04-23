@@ -7,7 +7,7 @@
     <p><strong>Nom:</strong> {{ $etudiant->Nom }} {{ $etudiant->Prénom }}</p>
 
     @if (empty($availableCours))
-    <div class="alert alert-info">Cet étudiant est déjà assigné à tous les cours.</div>
+    <div class="alert alert-info">Cet étudiant est déjà assigné à votre cours.</div>
     @else
     <form action="{{ route('etudiants.assign.store', $etudiant->IDEtudiant) }}" method="POST">
         @csrf

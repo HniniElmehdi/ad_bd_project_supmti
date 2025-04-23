@@ -9,11 +9,28 @@ use Illuminate\Support\Facades\DB;
 
 class ProfesseurController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $professeurs = DB::select("EXEC ObtenirTousLesProfesseurs");
-        return view('professeurs.index', compact('professeurs'));
+        $search = $request->input('search');
+        $column = $request->input('column', 'Nom');
+
+        $allowedColumns = ['Nom', 'Prénom', 'Email', 'TitreCours'];
+
+        if (!in_array($column, $allowedColumns)) {
+            $column = 'Nom';
+        }
+
+        if ($search) {
+            $professeurs = DB::select("
+            SELECT * FROM vue_professeurs_cours
+            WHERE $column LIKE ?", ['%' . $search . '%']);
+        } else {
+            $professeurs = DB::select("EXEC ObtenirTousLesProfesseurs");
+        }
+
+        return view('professeurs.index', compact('professeurs', 'search', 'column'));
     }
+
 
     public function create()
     {

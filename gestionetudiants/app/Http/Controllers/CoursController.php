@@ -10,15 +10,23 @@ class CoursController extends Controller
     public function index(Request $request)
     {
         $search = $request->input('search');
+        $column = $request->input('column', 'Titre');
+
+        $allowedColumns = ['Titre', 'Crédit'];
+
+        if (!in_array($column, $allowedColumns)) {
+            $column = 'Titre';
+        }
 
         if ($search) {
-            $cours = DB::select("SELECT * FROM Cours WHERE Titre LIKE ?", ['%' . $search . '%']);
+            $cours = DB::select("SELECT * FROM Cours WHERE $column LIKE ?", ['%' . $search . '%']);
         } else {
             $cours = DB::select("SELECT * FROM Cours");
         }
 
-        return view('cours.index', compact('cours', 'search'));
+        return view('cours.index', compact('cours', 'search', 'column'));
     }
+
 
 
     public function create()

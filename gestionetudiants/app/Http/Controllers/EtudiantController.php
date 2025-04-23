@@ -9,11 +9,31 @@ use Illuminate\Support\Facades\DB;
 
 class EtudiantController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $etudiants = DB::select('SELECT * FROM Vue_Etudiants');
-        return view('etudiants.index', ['etudiants' => $etudiants]);
+        $search = $request->input('search');
+        $column = $request->input('column', 'Nom'); // default to 'Nom'
+
+        $allowedColumns = ['Nom', 'Prénom', 'Email'];
+        if (!in_array($column, $allowedColumns)) {
+            $column = 'Nom'; // fallback protection
+        }
+
+        if ($search) {
+            $query = "SELECT * FROM Vue_Etudiants WHERE $column LIKE ?";
+            $etudiants = DB::select($query, ["%$search%"]);
+        } else {
+            $etudiants = DB::select('SELECT * FROM Vue_Etudiants');
+        }
+
+        return view('etudiants.index', [
+            'etudiants' => $etudiants,
+            'search' => $search,
+            'column' => $column
+        ]);
     }
+
+
     public function show($id)
     {
         $etudiant = DB::select('SELECT * FROM Etudiants WHERE IDEtudiant = ?', [$id]);
@@ -23,10 +43,10 @@ class EtudiantController extends Controller
         return response()->json($etudiant);
     }
 
-    public function create()
-    {
-        return view("etudiants.create");
-    }
+    // public function create()
+    // {
+    //     return view("etudiants.create");
+    // }
 
     public function store(Request $request)
     {
@@ -82,51 +102,88 @@ class EtudiantController extends Controller
         return redirect()->route('etudiants.index')->with('success', 'Étudiant mis à jour avec succès.');
     }
 
-    public function archivedStudents()
+    public function archivedStudents(Request $request)
     {
+        $search = $request->input('search');
+        $column = $request->input('column', 'Nom');
 
-        $archives = DB::select("
-        SELECT * FROM ArchivesEtudiants
-        ORDER BY IDArchive DESC
-    ");
+        $allowedColumns = ['Nom', 'Prénom', 'Email', 'DateSuppression'];
+        if (!in_array($column, $allowedColumns)) {
+            $column = 'Nom';
+        }
 
+        if ($search) {
+            $query = "SELECT * FROM ArchivesEtudiants WHERE $column LIKE ? ORDER BY IDArchive DESC";
+            $archives = DB::select($query, ["%$search%"]);
+        } else {
+            $archives = DB::select("SELECT * FROM ArchivesEtudiants ORDER BY IDArchive DESC");
+        }
 
-        return view('etudiants.archives', compact('archives'));
+        return view('etudiants.archives', [
+            'archives' => $archives,
+            'search' => $search,
+            'column' => $column
+        ]);
     }
 
-    public function createWithInscription()
+
+    // public function createWithInscription()
+    // {
+    //     $cours = DB::select("SELECT IDCours, Titre FROM Cours");
+    //     return view('etudiants.create_with_inscription', compact('cours'));
+    // }
+
+    // // Handle form
+    // public function storeWithInscription(Request $request)
+    // {
+    //     DB::statement("EXEC AjouterEtudiantAvecInscription
+    //     @Nom = ?,
+    //     @Prénom = ?,
+    //     @DateNaissance = ?,
+    //     @Email = ?,
+    //     @IDCours = ?",
+    //         [
+    //             $request->Nom,
+    //             $request->Prénom,
+    //             $request->DateNaissance,
+    //             $request->Email,
+    //             $request->IDCours
+    //         ]
+    //     );
+
+    //     return redirect()->route('etudiants.inscrits')->with('success', "Étudiant ajouté et inscrit avec succès !");
+    // }
+
+    public function etudiantsInscrits(Request $request)
     {
-        $cours = DB::select("SELECT IDCours, Titre FROM Cours");
-        return view('etudiants.create_with_inscription', compact('cours'));
+        $search = $request->input('search');
+        $column = $request->input('column', 'NomEtudiant');
+
+        $allowedColumns = [
+            'NomEtudiant',
+            'PrénomEtudiant',
+            'Email',
+            'TitreCours'
+        ];
+
+        if (!in_array($column, $allowedColumns)) {
+            $column = 'NomEtudiant';
+        }
+
+        if ($search) {
+            $query = "SELECT * FROM vue_etudiants_inscrits WHERE $column LIKE ? ORDER BY DateInscription DESC";
+            $etudiants = DB::select($query, ["%$search%"]);
+        } else {
+            $etudiants = DB::select('SELECT * FROM vue_etudiants_inscrits ORDER BY DateInscription DESC');
+        }
+
+        return view('etudiants.inscrits', [
+            'etudiants' => $etudiants,
+            'search' => $search,
+            'column' => $column
+        ]);
     }
 
-    // Handle form
-    public function storeWithInscription(Request $request)
-    {
-        DB::statement("EXEC AjouterEtudiantAvecInscription
-        @Nom = ?,
-        @Prénom = ?,
-        @DateNaissance = ?,
-        @Email = ?,
-        @IDCours = ?",
-            [
-                $request->Nom,
-                $request->Prénom,
-                $request->DateNaissance,
-                $request->Email,
-                $request->IDCours
-            ]
-        );
-
-        return redirect()->route('etudiants.inscrits')->with('success', "Étudiant ajouté et inscrit avec succès !");
-    }
-
-    public function etudiantsInscrits()
-    {
-        $etudiants = DB::select('SELECT * FROM vue_etudiants_inscrits');
-        // return $etudiants;
-        return view('etudiants.inscrits', ['etudiants' => $etudiants]);
-    }
 
     public function etudiantsInscritsDestroy($id)
     {
@@ -173,11 +230,30 @@ class EtudiantController extends Controller
     }
 
 
-    public function auditLog()
+    public function auditLog(Request $request)
     {
-        $logs = DB::select('SELECT * FROM AuditLog ORDER BY Timestamp DESC');
-        return view('etudiants.audit', compact('logs'));
+        $search = $request->input('search');
+        $column = $request->input('column', 'Action');
+
+        $allowedColumns = ['Action', 'TableName', 'Details'];
+        if (!in_array($column, $allowedColumns)) {
+            $column = 'Action';
+        }
+
+        if ($search) {
+            $query = "SELECT * FROM AuditLog WHERE $column LIKE ? ORDER BY Timestamp DESC";
+            $logs = DB::select($query, ["%$search%"]);
+        } else {
+            $logs = DB::select("SELECT * FROM AuditLog ORDER BY Timestamp DESC");
+        }
+
+        return view('etudiants.audit', [
+            'logs' => $logs,
+            'search' => $search,
+            'column' => $column
+        ]);
     }
+
 
 
 
@@ -185,12 +261,24 @@ class EtudiantController extends Controller
     {
         $etudiant = DB::selectOne('SELECT * FROM Etudiants WHERE IDEtudiant = ?', [$idEtudiant]);
 
-        $availableCours = DB::select("
-        SELECT * FROM Cours
-        WHERE IDCours NOT IN (
+        if(auth()->user()->user_role === 'professeur'){
+            $availableCours = DB::select("
+        SELECT * FROM Cours c, Professeurs p
+        WHERE c.IDCours = p.IDCours  AND p.IDCours NOT IN (
             SELECT IDCours FROM Inscriptions WHERE IDEtudiant = ?
         )
     ", [$idEtudiant]);
+
+        }else{
+
+
+            $availableCours = DB::select("
+            SELECT * FROM Cours
+            WHERE IDCours NOT IN (
+                SELECT IDCours FROM Inscriptions WHERE IDEtudiant = ?
+                )
+                ", [$idEtudiant]);
+        }
 
         return view('etudiants.assign', compact('etudiant', 'availableCours'));
     }
@@ -207,6 +295,26 @@ class EtudiantController extends Controller
         ]);
 
         return redirect()->route('etudiants.index')->with('success', 'Cours assigné avec succès.');
+    }
+
+
+    public function dashboard()
+    {
+        $userId = auth()->user()->IDUser;
+        // Assuming there's a matching étudiant record
+        $etudiant = DB::table('Etudiants')->where('IDUser', $userId)->first();
+
+        if (!$etudiant) {
+            abort(403, 'Non autorisé.');
+        }
+
+        $cours = DB::select("
+        SELECT *
+        FROM vue_etudiants_inscrits
+        WHERE IDEtudiant = ?
+    ", [$etudiant->IDEtudiant]);
+
+        return view('etudiants.dashboard', compact('cours'));
     }
 
 

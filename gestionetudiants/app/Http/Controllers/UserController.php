@@ -82,9 +82,9 @@ class UserController extends Controller
     {
         return view("auth.login");
     }
-    public function showRegisterForm()
+    public function showRegisterForm($type = "etudiant")
     {
-        return view("auth.register");
+        return view("auth.register", compact('type'));
     }
 
     public function logout()

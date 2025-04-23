@@ -13,12 +13,26 @@ class RoleMiddleware
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
-    public function handle(Request $request, Closure $next, $role): Response
+    public function handle(Request $request, Closure $next, ...$roles): Response
     {
-        if (auth()->check() && auth()->user()->user_role === $role) {
+
+
+        if (auth()->check() && in_array(auth()->user()->user_role, $roles)) {
             return $next($request);
         }
 
-        return redirect()->route('home')->with('error', 'Unauthorized access');
+        if (!auth()->check()) {
+            return redirect()->route('login.form');
+        }
+
+        switch (auth()->user()->user_role) {
+            case 'etudiant':
+                return redirect()->route('etudiant.dashboard');
+            case 'professeur':
+                return redirect()->route('etudiants.index');
+            default:
+                return abort(401);
+        }
+        abort(401);
     }
 }

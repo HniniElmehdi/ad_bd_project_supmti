@@ -4,11 +4,22 @@
 <div class="container">
     <h1>Liste des Cours</h1>
 
-    <form method="GET" action="{{ route('cours.index') }}" class="mb-3">
-        <input type="text" name="search" value="{{ request('search') }}" placeholder="Rechercher par titre..."
+    <form method="GET" action="{{ route('cours.index') }}" class="mb-3 d-flex gap-2">
+        <select name="column" class="form-select w-auto">
+            <option value="Titre" {{ request('column') == 'Titre' ? 'selected' : '' }}>Titre</option>
+            <option value="Crédit" {{ request('column') == 'Crédit' ? 'selected' : '' }}>Crédit</option>
+        </select>
+
+        <input type="text" name="search" value="{{ request('search') }}" placeholder="Rechercher..."
             class="form-control" />
-        <button type="submit" class="btn btn-primary mt-2">Rechercher</button>
+
+        <button type="submit" class="btn btn-primary">Rechercher</button>
+
+        @if(request('search'))
+        <a href="{{ route('cours.index') }}" class="btn btn-secondary">Annuler</a>
+        @endif
     </form>
+
 
     @if(count($cours) > 0)
     <table class="table table-bordered">

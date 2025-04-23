@@ -42,14 +42,32 @@
                 <input type="password" class="form-control" id="MotDePasse_confirmation" name="MotDePasse_confirmation"
                     required>
             </div>
-            <div class="mb-3">
-                <label for="user_role" class="form-label">Role</label>
-                <select class="form-control" id="user_role" name="user_role">
-                    <option value="etudiant" {{ old('user_role') == 'etudiant' ? 'selected' : '' }}>Etudiant</option>
-                    <option value="professeur" {{ old('user_role') == 'professeur' ? 'selected' : '' }}>Professeur</option>
-                    <option value="admin" {{ old('user_role') == 'admin' ? 'selected' : '' }}>Admin</option>
-                </select>
-            </div>
+            @if (isset($type))
+                <div class="mb-3">
+                    <label for="user_role" class="form-label">Role</label>
+                    <select class="form-control" id="user_role" name="user_role">
+                        <option value="etudiant" {{ $type === 'etudiant' ? 'selected' : '' }}>Etudiant</option>
+                        <option value="professeur" {{ $type === 'professeur' ? 'selected' : '' }}>Professeur</option>
+                        <option value="admin" {{ $type === 'admin' ? 'selected' : '' }}>Admin</option>
+                    </select>
+                </div>
+            @else
+                <div class="mb-3">
+                    <label for="user_role" class="form-label">Role</label>
+                    <select class="form-control" id="user_role" name="user_role">
+                        <option value="etudiant" {{ old('user_role') == 'etudiant' ? 'selected' : '' }}>Etudiant</option>
+                        <option value="professeur" {{ old('user_role') == 'professeur' ? 'selected' : '' }}>Professeur</option>
+                        <option value="admin" {{ old('user_role') == 'admin' ? 'selected' : '' }}>Admin</option>
+                    </select>
+                </div>
+            @endif
+            @if (isset($type) && $type === 'professeur')
+                <a href="{{ route('professeurs.index') }}">cancel</a>
+            @elseif ($type === 'admin')
+                <a href="{{ route('professeurs.index') }}">cancel</a>
+            @else
+                <a href="{{ route('etudiants.index') }}">cancel</a>
+            @endif
             <button type="submit" class="btn btn-primary">Register</button>
         </form>
     </div>
